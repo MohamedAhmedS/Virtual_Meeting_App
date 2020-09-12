@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="clients">
+        <item>Visitor</item>
+        <item>Officer</item>
+        <item>Inmate</item>
+    </array>
+</resources>

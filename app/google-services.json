@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1087834759112",
+    "firebase_url": "https://virtualmeetingapp.firebaseio.com",
+    "project_id": "virtualmeetingapp",
+    "storage_bucket": "virtualmeetingapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1087834759112:android:cdddc38dd4e5554c5d2afd",
+        "android_client_info": {
+          "package_name": "com.example.virtualmeetingapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1087834759112-5fa26ofmsa05rqoclqg70co5e2389kcb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.virtualmeetingapp",
+            "certificate_hash": "2d42f0cac13dc78ea3bdf93c5ad20c0366546f96"
+          }
+        },
+        {
+          "client_id": "1087834759112-j0de4tdi7o0kjs0615ktgimucek6976o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnQHPdUbwvAJXjQG1Hye6iKGKSDzbFmmI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1087834759112-j0de4tdi7o0kjs0615ktgimucek6976o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
