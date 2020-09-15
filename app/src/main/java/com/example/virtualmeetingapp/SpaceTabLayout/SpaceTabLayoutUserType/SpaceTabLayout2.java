@@ -151,11 +151,11 @@ public class SpaceTabLayout2 extends RelativeLayout {
 
         tabLayout = findViewById(R.id.spaceTab);
 
-        defaultTabOneButtonIcon = getContext().getResources().getDrawable(R.drawable.ic_tab_one);
+        defaultTabOneButtonIcon = getContext().getResources().getDrawable(R.drawable.list);
         defaultTabTwoButtonIcon = getContext().getResources().getDrawable(R.drawable.ic_tab_two);
         defaultTabThreeButtonIcon = getContext().getResources().getDrawable(R.drawable.ic_tab_three);
         defaultTabFourButtonIcon = getContext().getResources().getDrawable(R.drawable.ic_tab_four);
-        defaultTabFiveButtonIcon = getContext().getResources().getDrawable(R.drawable.ic_tab_five);
+        defaultTabFiveButtonIcon = getContext().getResources().getDrawable(R.drawable.chat);
 
         brown1 = getContext().getResources().getDrawable(R.drawable.ic_tab_onebrown);
         brown2 = getContext().getResources().getDrawable(R.drawable.ic_tab_twobrown);
@@ -413,7 +413,7 @@ public class SpaceTabLayout2 extends RelativeLayout {
         if (numberOfTabs == 3 && !iconOnly) {
             if (text_one != null) setTabOneText(text_one);
             if (text_two != null) setTabTwoText(text_two);
-            if (text_three != null) setTabThreeText(text_three);
+            if (text_three != null) setTabThreeText("Chat");
 
             setTabOneTextColor(defaultTextColor);
             setTabTwoTextColor(defaultTextColor);

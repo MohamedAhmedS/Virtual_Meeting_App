@@ -3,6 +3,7 @@ package com.example.virtualmeetingapp;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -15,12 +16,16 @@ import com.bumptech.glide.Glide;
 import com.example.virtualmeetingapp.Model.User;
 import com.example.virtualmeetingapp.SpaceTabLayout.SpaceTabLayoutUserType.SpaceTabLayout1;
 import com.example.virtualmeetingapp.SpaceTabLayout.SpaceTabLayoutUserType.SpaceTabLayout2;
+import com.example.virtualmeetingapp.SpaceTabLayout.fragments.ChatListFragment;
 import com.example.virtualmeetingapp.SpaceTabLayout.fragments.FragmentA;
 import com.example.virtualmeetingapp.SpaceTabLayout.fragments.FragmentB;
 import com.example.virtualmeetingapp.SpaceTabLayout.fragments.FragmentC;
 import com.example.virtualmeetingapp.SpaceTabLayout.fragments.FragmentD;
 import com.example.virtualmeetingapp.SpaceTabLayout.fragments.FragmentE;
+import com.example.virtualmeetingapp.SpaceTabLayout.fragments.UsersFragment;
+import com.example.virtualmeetingapp.utils.Constants;
 import com.example.virtualmeetingapp.utils.Global;
+import com.example.virtualmeetingapp.utils.SystemPrefs;
 import com.example.virtualmeetingapp.utils.TextUtil;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -40,7 +45,7 @@ import carbon.widget.ViewPager;
 public class MainActivity extends AppCompatActivity {
     SpaceTabLayout1 tabLayout1;
     SpaceTabLayout2 tabLayout2;
-    private User userType;
+    private User user;
     FirebaseAuth auth;
     DatabaseReference userRef;
 
@@ -54,6 +59,12 @@ public class MainActivity extends AppCompatActivity {
         tabLayout2 = (SpaceTabLayout2) findViewById(R.id.spaceTabLayout2);
         auth = FirebaseAuth.getInstance();
 
+        SharedPreferences.Editor editor = getSharedPreferences("PREFS", MODE_PRIVATE).edit();
+        editor.putString("profileid", Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid());
+        editor.apply();
+
+//        Intent intent = getIntent();
+//        intent.getStringExtra("uid");
 //        Bundle intent = getIntent().getExtras();
 //        String user = intent.getString("uid", auth.getCurrentUser().getUid());
 //        if (intent != null) {
@@ -67,22 +78,42 @@ public class MainActivity extends AppCompatActivity {
 //            fragmentList.add(new FragmentA());
 //
 //        }
-        String uids = userType.getUserType();
+        //get user object from shared preference
+        user = (User) new SystemPrefs(this).getOjectData(Constants.USER, User.class);
+        String userType = user.getUserType();
+        String id = user.getId();
+        //other info of user
+//        String id = user.getId();
+//        String userName = user.getUserName();
+        Log.d("userType" , userType);
 
 
-//        if(userType != null) {
-        if (uids.equals("visitor"))
-            visitor();
+        if(userType != null) {
+            if (userType.equals("visitor")) {
+                tabLayout1.setVisibility(View.VISIBLE);
+                tabLayout2.setVisibility(View.GONE);
 
-        if (uids.equals("officer"))
-            officer();
+                visitor();
+            } else if (userType.equals("officer")) {
+                tabLayout1.setVisibility(View.GONE);
+                tabLayout2.setVisibility(View.VISIBLE);
+                officer();
+            } else if (userType.equals("admin")) {
+                tabLayout1.setVisibility(View.GONE);
+                tabLayout2.setVisibility(View.VISIBLE);
+                admin();
+            } else {
+                tabLayout1.setVisibility(View.VISIBLE);
+                tabLayout2.setVisibility(View.GONE);
+                prisoner();
+            }
+        }
+    }
 
-        if (uids.equals("admin"))
-            admin();
+    @Override
+    public void onBackPressed() {
 
-        if (uids.equals("inmate"))
-            prisoner();
-//        }
+        finish();
 
     }
 
@@ -91,9 +122,11 @@ public class MainActivity extends AppCompatActivity {
         List<Fragment> fragmentList = new ArrayList<>();
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
 
-        fragmentList.add(new FragmentA());
+
+
+        fragmentList.add(new UsersFragment());
         fragmentList.add(new FragmentB());
-        fragmentList.add(new FragmentC());
+        fragmentList.add(new ChatListFragment());
 
         tabLayout1.initialize(viewPager, getSupportFragmentManager(), fragmentList);
 
@@ -120,11 +153,11 @@ public class MainActivity extends AppCompatActivity {
         List<Fragment> fragmentList = new ArrayList<>();
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
 
-        fragmentList.add(new FragmentA());
+        fragmentList.add(new UsersFragment());
         fragmentList.add(new FragmentB());
         fragmentList.add(new FragmentC());
         fragmentList.add(new FragmentD());
-        fragmentList.add(new FragmentE());
+        fragmentList.add(new ChatListFragment());
 
         tabLayout2.initialize(viewPager, getSupportFragmentManager(), fragmentList);
 
@@ -151,11 +184,11 @@ public class MainActivity extends AppCompatActivity {
         List<Fragment> fragmentList = new ArrayList<>();
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
 
-        fragmentList.add(new FragmentA());
+        fragmentList.add(new UsersFragment());
         fragmentList.add(new FragmentB());
         fragmentList.add(new FragmentC());
         fragmentList.add(new FragmentD());
-        fragmentList.add(new FragmentE());
+        fragmentList.add(new ChatListFragment());
 
         tabLayout2.initialize(viewPager, getSupportFragmentManager(), fragmentList);
 
@@ -182,9 +215,9 @@ public class MainActivity extends AppCompatActivity {
         List<Fragment> fragmentList = new ArrayList<>();
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
 
-        fragmentList.add(new FragmentA());
+        fragmentList.add(new UsersFragment());
         fragmentList.add(new FragmentB());
-        fragmentList.add(new FragmentC());
+        fragmentList.add(new ChatListFragment());
 
         tabLayout1.initialize(viewPager, getSupportFragmentManager(), fragmentList);
 
@@ -205,4 +238,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+
 }

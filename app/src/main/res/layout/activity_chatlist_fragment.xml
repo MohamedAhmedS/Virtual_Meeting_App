@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<carbon.widget.RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#292929"
+    tools:context=".SpaceTabLayout.fragments.ChatListFragment">
+    <carbon.widget.LinearLayout
+        android:id="@+id/bar"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:background="#423e47">
+        <EditText
+            android:id="@+id/search_bar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:hint="Search for users . . ."
+            android:textColorHint="#dcdcdc"
+            android:layout_weight="7"
+            android:background="@color/transparent"
+            android:outlineProvider="none"
+            android:nestedScrollingEnabled="false"
+            android:maxLines="1"
+            android:drawableRight="@drawable/search" />
+
+        <ImageView
+            android:id="@+id/btnClose"
+            android:layout_width="wrap_content"
+            android:layout_height="26dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="1"
+            android:padding="1dp"
+            android:background="@drawable/btnimage"
+            android:src="@drawable/close" />
+    </carbon.widget.LinearLayout>
+    <View
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:background="#dcdcdc"
+        android:layout_height="0.1dp"
+        android:layout_below="@+id/bar"
+        />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/view">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/transparent"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/row_chatlist" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/moi"
+            android:layout_gravity="center"
+            android:alpha=".10"/>
+        <TextView
+            android:id="@+id/noUser"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:elevation="4dp"
+            android:gravity="center"
+            android:text="No User Available"
+            android:textColor="#ae863b" />
+    </FrameLayout>
+
+
+
+</carbon.widget.RelativeLayout>

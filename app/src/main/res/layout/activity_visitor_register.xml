@@ -56,7 +56,7 @@
 
     </LinearLayout>
     <EditText
-        android:id="@+id/inmateEmail"
+        android:id="@+id/visitorName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/edittext_bg"

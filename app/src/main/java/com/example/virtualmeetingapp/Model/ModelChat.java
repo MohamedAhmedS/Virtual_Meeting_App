@@ -3,6 +3,7 @@ package com.example.virtualmeetingapp.Model;
 public class ModelChat {
     private String message, receiver, sender, timestamp, type;
     private boolean isSeen;
+//    private long ts;
 
     public ModelChat() {
     }
@@ -14,6 +15,7 @@ public class ModelChat {
         this.timestamp = timestamp;
         this.type = type;
         this.isSeen = isSeen;
+//        this.ts = ts;
     }
 
     public String getType() {
@@ -55,6 +57,13 @@ public class ModelChat {
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
+//    public long getTs() {
+//        return ts;
+//    }
+
+//    public void setTs(String timestamp) {
+//        this.timestamp = timestamp;
+//    }
 
     public boolean isSeen() {
         return isSeen;

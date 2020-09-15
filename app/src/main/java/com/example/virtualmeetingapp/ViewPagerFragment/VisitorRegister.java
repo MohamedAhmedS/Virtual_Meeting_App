@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +39,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -52,7 +58,7 @@ import static android.app.Activity.RESULT_OK;
 
 public class VisitorRegister extends Fragment {
     private CountryCodePicker ccp;
-    private EditText phoneText;
+    private EditText phoneText, userName, description;
     private EditText codeText;
     private Button continueAndNextBtn;
     private String checker = "", phoneNumber = "";
@@ -69,6 +75,8 @@ public class VisitorRegister extends Fragment {
     RecyclerView recyclerView;
     List<ImageModel> imageModels;
     ImageAdapter imageAdapter;
+    ProgressDialog pd;
+
 
     private StorageReference mStorageRef;
 
@@ -85,6 +93,8 @@ public class VisitorRegister extends Fragment {
 
 
         phoneText = view.findViewById(R.id.phoneNumber);
+        userName = view.findViewById(R.id.visitorName);
+        description = view.findViewById(R.id.description);
         continueAndNextBtn = view.findViewById(R.id.btnSendCode);
         selectBtn = view.findViewById(R.id.btnSelect);
         recyclerView = view.findViewById(R.id.recyclerViewId);
@@ -119,6 +129,8 @@ public class VisitorRegister extends Fragment {
 //            noImage.setVisibility(View.GONE);
 //        }
 
+
+
         ccp = (CountryCodePicker) view.findViewById(R.id.ccp);
         ccp.registerCarrierNumberEditText(phoneText);
 
@@ -127,18 +139,67 @@ public class VisitorRegister extends Fragment {
             @Override
             public void onClick(View v) {
                 phoneNumber = ccp.getFullNumberWithPlus();
-                if (!phoneNumber.equals("")) {
-                    loadingBar.setTitle("Phone Number Verification");
-                    loadingBar.setMessage("Please wait, while we are verifying your phone number.");
-                    loadingBar.setCanceledOnTouchOutside(false);
-                    loadingBar.show();
-                    Intent intent = new Intent(getContext(), VerificationActivity.class);
-                    startActivity(intent);
 
-                    PhoneAuthProvider.getInstance().verifyPhoneNumber(phoneNumber, 60, TimeUnit.SECONDS, getActivity(), mCallbacks);
-                } else {
-                    Toast.makeText(getContext(), "Please write valid phone number.", Toast.LENGTH_SHORT).show();
-                }
+                pd = new ProgressDialog(getContext());
+                pd.setMessage("Please wait...");
+                pd.show();
+
+                final String str_username = userName.getText().toString();
+                final String str_phoneNo = phoneText.getText().toString();
+                final String str_description = description.getText().toString();
+
+                Query usernameQuery = FirebaseDatabase.getInstance().getReference().child("Users").orderByChild("userName").equalTo(str_username);
+                usernameQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                        if (TextUtils.isEmpty(str_username) && TextUtils.isEmpty(str_phoneNo) &&
+                                TextUtils.isEmpty(str_description)) {
+                            pd.dismiss();
+                            userName.setError("Username is required!");
+                            phoneText.setError("Phone Number is required!");
+                            description.setError("description is required!");
+                        }
+
+                        else if(str_phoneNo.length() != 10)
+                        {
+                            pd.dismiss();
+                            phoneText.setError("Phone Number should have no less or more than 10 characters!");
+
+                        }
+
+                        else if(dataSnapshot.getChildrenCount() > 0)
+                        {
+                            pd.dismiss();
+                            userName.setError("Username already exists!");
+                        }
+                        else if(str_description.length() < 15)
+                        {
+                            description.setError("Description should contain atleast 15 characters!");
+                        }
+                        else {
+//                            register(str_username, str_phoneNo, str_email, str_password);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+//                if (!phoneNumber.equals("")) {
+//                    loadingBar.setTitle("Phone Number Verification");
+//                    loadingBar.setMessage("Please wait, while we are verifying your phone number.");
+//                    loadingBar.setCanceledOnTouchOutside(false);
+//                    loadingBar.show();
+//                    Intent intent = new Intent(getContext(), VerificationActivity.class);
+//                    intent.putExtra("mobile", phoneNumber);
+//                    startActivity(intent);
+//
+//                    PhoneAuthProvider.getInstance().verifyPhoneNumber(phoneNumber, 60, TimeUnit.SECONDS, getActivity(), mCallbacks);
+//                } else {
+//                    Toast.makeText(getContext(), "Please write valid phone number.", Toast.LENGTH_SHORT).show();
+//                }
 
             }
 
@@ -148,7 +209,7 @@ public class VisitorRegister extends Fragment {
         mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
             @Override
             public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential) {
-                signInWithPhoneAuthCredential(phoneAuthCredential);
+//                signInWithPhoneAuthCredential(phoneAuthCredential);
             }
 
             @Override
@@ -198,30 +259,23 @@ public class VisitorRegister extends Fragment {
         }
     }
 
-    private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener((Executor) this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            loadingBar.dismiss();
-                            Toast.makeText(getContext(), "Congratulations, you are logged in successfully.", Toast.LENGTH_SHORT).show();
-                            sendUserToMainActivity();
-                        } else {
-                            loadingBar.dismiss();
-                            String e = task.getException().toString();
-                            Toast.makeText(getContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-    }
-
-
-    private void sendUserToMainActivity() {
-        Intent intent = new Intent(getContext(), MainActivity.class);
-        startActivity(intent);
-        getActivity().finish();
-    }
+//    private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
+//        mAuth.signInWithCredential(credential)
+//                .addOnCompleteListener((Executor) this, new OnCompleteListener<AuthResult>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<AuthResult> task) {
+//                        if (task.isSuccessful()) {
+//                            loadingBar.dismiss();
+//                            Toast.makeText(getContext(), "Congratulations, you are logged in successfully.", Toast.LENGTH_SHORT).show();
+//                            sendUserToMainActivity();
+//                        } else {
+//                            loadingBar.dismiss();
+//                            String e = task.getException().toString();
+//                            Toast.makeText(getContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
+//                        }
+//                    }
+//                });
+//    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
