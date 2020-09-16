@@ -35,15 +35,39 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity"></activity>
-        <activity android:name=".CallingActivity"></activity>
-        <activity android:name=".VideoChatActivity"></activity>
-        <activity android:name=".ViewPagerFragment.InmateLogin" />
-        <activity android:name=".ViewPagerFragment.OfficerLogin" />
-        <activity android:name=".ViewPagerFragment.VisitorRegister" />
-        <activity android:name=".adapter.TabFragmentAdapter" />
+        <activity android:name=".MainActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|fontScale"
+            android:screenOrientation="portrait"
+            tools:ignore="Instantiatable"></activity>
+        <activity android:name=".CallingActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|fontScale"
+            android:screenOrientation="portrait"
+            tools:ignore="Instantiatable"
+            ></activity>
+        <activity android:name=".VideoChatActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|fontScale"
+            android:screenOrientation="portrait"
+            tools:ignore="Instantiatable"></activity>
+
+<!--        <provider-->
+<!--            android:name="androidx.core.content.FileProvider"-->
+<!--            android:authorities="${applicationId}.provider"-->
+<!--            android:exported="false"-->
+<!--            android:grantUriPermissions="true">-->
+<!--            <meta-data-->
+<!--                android:name="android.support.FILE_PROVIDER_PATHS"/>-->
+<!--        </provider>-->
+
+        <activity android:name=".ViewPagerFragment.InmateLogin" android:screenOrientation="portrait"
+            tools:ignore="Instantiatable" />
+        <activity android:name=".ViewPagerFragment.OfficerLogin" android:screenOrientation="portrait"
+            tools:ignore="Instantiatable" />
+        <activity android:name=".ViewPagerFragment.VisitorRegister" android:screenOrientation="portrait"
+            tools:ignore="Instantiatable" />
+        <activity android:name=".adapter.TabFragmentAdapter" android:screenOrientation="portrait"
+            tools:ignore="Instantiatable" />
         <activity android:name=".VerificationActivity"></activity>
-        <activity android:name=".ClientTypeActivity">
+        <activity android:name=".ClientTypeActivity" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -34,6 +34,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -43,10 +44,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ImageViewHolde
 
     private Context mContext;
     private List<User> mUsers;
-    private boolean isFragment;
     private List<User> mUser;
 
     private FirebaseUser firebaseUser;
+    private boolean isFragment;
     private String userName="", profileImage="";
     private String calledBy="";
 //    private ProfileFragment profileFragment = new ProfileFragment();
@@ -67,14 +68,16 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ImageViewHolde
     @Override
     public void onBindViewHolder(@NonNull final UserAdapter.ImageViewHolder holder, final int position) {
 
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
+        String userID = firebaseUser.getUid();
 
 //        holder.userItem.setAnimation(AnimationUtils.loadAnimation(mContext, R.anim.fade_scale_anim));
 
         final Activity activity = (Activity) mContext;
         final User user = mUsers.get(position);
 
-        if (!user.getId().equals(firebaseUser.getUid()) && firebaseUser != null) {
+        if (!user.getId().equals(userID) && userID != null) {
 
 //            holder.btn_follow.setVisibility(View.VISIBLE);
 //            isFollowing(user.getId(), holder.btn_follow);
@@ -90,31 +93,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ImageViewHolde
             Glide.with(mContext).load(R.drawable.placeholder).into(holder.image_profile);
 
             checkForReceivingCall();
-
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (isFragment) {
-                        SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", MODE_PRIVATE).edit();
-                        editor.putString("profileid", user.getId());
-                        editor.apply();
-
-//                        ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-//                                new ProfileFragment()).commit();
-
-//                        getFragmentInstance.getInstance().setSearchFragment(profileFragment);
-//                        ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction()
-//                                .replace(R.id.fragment_container,
-//                                        getFragmentInstance.getInstance().getSearchFragment()).commit();
-                    } else {
-                        Intent intent = new Intent(mContext, MainActivity.class);
-                        intent.putExtra("publisherid", user.getId());
-                        mContext.startActivity(intent);
-                        ((Activity) mContext).finish();
-//                        activity.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
-                    }
-                }
-            });
 
                 holder.btnChat.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -136,7 +114,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ImageViewHolde
                         Intent intent = new Intent(mContext, CallingActivity.class);
                         intent.putExtra("hisUid", user.getId());
                         intent.putExtra("myUid", firebaseUser.getUid());
-//                        intent.putExtra("visit_user_id", listUserId);
                         mContext.startActivity(intent);
                         ((Activity) mContext).finish();
 
@@ -148,22 +125,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ImageViewHolde
 
 
     }
-
-//    private void addNotification(String userid) {
-//        final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-//        if (firebaseUser != null) {
-//            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Notifications").child(userid);
-//
-//            HashMap<String, Object> hashMap = new HashMap<>();
-//            hashMap.put("userid", firebaseUser.getUid());
-//            hashMap.put("text", "started following you");
-//            hashMap.put("postid", "");
-//            hashMap.put("ispost", false);
-//
-//            reference.push().setValue(hashMap);
-//        }
-//    }
-
 
     @Override
     public int getItemCount() {
@@ -190,31 +151,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ImageViewHolde
         }
     }
 
-//    private void isFollowing(final String userid, final Button button) {
-//
-//        final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-//
-//        if (firebaseUser != null) {
-//            DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
-//                    .child("Follow").child(Objects.requireNonNull(firebaseUser).getUid()).child("following");
-//            reference.addListenerForSingleValueEvent(new ValueEventListener() {
-//                @SuppressLint("SetTextI18n")
-//                @Override
-//                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                    if (dataSnapshot.child(userid).exists()) {
-//                        button.setText("following");
-//                    } else {
-//                        button.setText("follow");
-//                    }
-//                }
-//
-//                @Override
-//                public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                }
-//            });
-//        }
-//    }
 private void checkForReceivingCall()
 {
     DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("Users");
@@ -243,6 +179,9 @@ private void checkForReceivingCall()
                 }
             });
 }
-
+    public void filterList(ArrayList<User> filteredList) {
+        mUsers = filteredList;
+        notifyDataSetChanged();
+    }
 
 }

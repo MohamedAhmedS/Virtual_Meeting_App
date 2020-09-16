@@ -150,32 +150,7 @@ public class ChatListFragment extends Fragment {
         }
         adapterChatlist.filterList(filteredList);
     }
-//    private void searchUsers(final String s) {
-//        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Users");
-//
-//        userRef.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                userList.clear();
-//                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-//                    User user = snapshot.getValue(User.class);
-//                    if(user.getUserName().contains(s)) {
-//                        userList.add(user);
-//                    }
-//                }
-//
-//                adapterChatlist = new AdapterChatlist(getContext(), userList);
-//                recyclerView.setAdapter(adapterChatlist);
-//                recyclerView.setItemViewCacheSize(1024);
-//                adapterChatlist.notifyDataSetChanged();
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
-//    }
+
     private void loadChats() {
         userList = new ArrayList<>();
         reference = FirebaseDatabase.getInstance().getReference("Users");
@@ -199,6 +174,7 @@ public class ChatListFragment extends Fragment {
                     adapterChatlist = new AdapterChatlist(getContext(), userList);
                     //setadapter
                     recyclerView.setAdapter(adapterChatlist);
+
                     //set last message
                     for (int i = 0; i < userList.size(); i++) {
                         lastMessage(userList.get(i).getId());

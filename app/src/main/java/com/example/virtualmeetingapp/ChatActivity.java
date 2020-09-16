@@ -101,8 +101,6 @@ public class ChatActivity extends AppCompatActivity {
     FirebaseUser user;
 
 
-
-    User currentUser;
     String hisUid;
     String myUid;
     String hisImage;
@@ -123,12 +121,14 @@ public class ChatActivity extends AppCompatActivity {
     String[] storagePermissions;
     private String profileid;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chat);
+    private void init() {
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        String user1 = user.getUid();
 
-        //init views
+        Intent intent = getIntent();
+        hisUid = intent.getExtras().getString("hisUid");
+        myUid = intent.getExtras().getString("myUid", user1);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle("");
@@ -139,27 +139,23 @@ public class ChatActivity extends AppCompatActivity {
         messageEt = findViewById(R.id.messageEt);
         sendBtn = findViewById(R.id.sendBtn);
         attachBtn = findViewById(R.id.attachBtn);
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        //init permissions arrays
         cameraPermissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
         storagePermissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
-
         requestQueue = Volley.newRequestQueue(getApplicationContext());
-
-        SharedPreferences prefs = getSharedPreferences("PREFS", MODE_PRIVATE);
-        profileid = prefs.getString("profileid", "none");
-
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setStackFromEnd(true);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(linearLayoutManager);
 
+    }
 
-        Intent intent = getIntent();
-        hisUid = intent.getExtras().getString("hisUid");
-        myUid = intent.getExtras().getString("myUid", user.getUid());
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_chat);
 
-        currentUser = Global.getCurrentUser();
+        init();
+
         checkUserStatus();
         usersDbRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
@@ -221,7 +217,7 @@ public class ChatActivity extends AppCompatActivity {
                     FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
                         @Override
                         public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                            if(!task.isSuccessful()){
+                            if (!task.isSuccessful()) {
                                 Toast.makeText(ChatActivity.this, "getInstanceId failed!", Toast.LENGTH_LONG).show();
                                 return;
                             }
@@ -310,10 +306,10 @@ public class ChatActivity extends AppCompatActivity {
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
                     ModelChat chat = ds.getValue(ModelChat.class);
                     assert chat != null;
-                        if (chat.getReceiver().equals(myUid) && chat.getSender().equals(hisUid) ||
-                                chat.getReceiver().equals(hisUid) && chat.getSender().equals(myUid)) {
-                            chatList.add(chat);
-                        }
+                    if (chat.getReceiver().equals(myUid) && chat.getSender().equals(hisUid) ||
+                            chat.getReceiver().equals(hisUid) && chat.getSender().equals(myUid)) {
+                        chatList.add(chat);
+                    }
 
                     //adapter
                     adapterChat = new AdapterChat(ChatActivity.this, chatList, hisImage);
@@ -381,7 +377,6 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         });
-
 
 
         final DatabaseReference chatRef2 = FirebaseDatabase.getInstance().getReference().child("Chatlist")
@@ -578,11 +573,11 @@ public class ChatActivity extends AppCompatActivity {
 
     private void checkUserStatus() {
 
-        if (currentUser != null) {
+        if (myUid != null) {
             //user is signed in stay here
             //set email of logged in user
             //mProfileTv.setText(user.getEmail());
-            myUid = currentUser.getId(); //currently signed in user's uid
+            myUid = user.getUid(); //currently signed in user's uid
         } else {
             //user not signed in, go to main acitivity
 //            startActivity(new Intent(this, MainActivity.class));
@@ -645,94 +640,6 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-//    private void runTextRecognition(final Uri filePath, final ProgressDialog progressDialog) {
-//
-//        try {
-//            FirebaseVisionImage image = FirebaseVisionImage.fromFilePath(this, filePath);
-//            FirebaseVisionTextRecognizer recognizer = FirebaseVision.getInstance().getOnDeviceTextRecognizer();
-//
-//            recognizer.processImage(image)
-//                    .addOnSuccessListener(
-//                            new OnSuccessListener<FirebaseVisionText>() {
-//                                @Override
-//                                public void onSuccess(FirebaseVisionText texts) {
-//                                    BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-//                                    Bitmap bitmap = BitmapFactory.decodeFile(filePath.getPath(), bmOptions);
-//                                    processTextRecognitionResult(texts, bitmap, progressDialog);
-//                                }
-//                            })
-//                    .addOnFailureListener(
-//                            new OnFailureListener() {
-//                                @Override
-//                                public void onFailure(@NonNull Exception e) {
-//                                    // Task failed with an exception
-//                                    progressDialog.dismiss();
-//                                    Toast.makeText(ChatActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-//                                    e.printStackTrace();
-//                                }
-//                            });
-//        } catch (IOException e) {
-//            progressDialog.dismiss();
-//            Toast.makeText(ChatActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    private void processTextRecognitionResult(FirebaseVisionText texts, Bitmap bitmap, final ProgressDialog progressDialog) {
-//
-//        final String uri = Environment.getExternalStorageDirectory() + "/temp.jpg";
-//
-//        File file = new File(uri);
-//
-//        List<FirebaseVisionText.TextBlock> blocks = texts.getTextBlocks();
-//        if (blocks.size() == 0) {
-//            progressDialog.dismiss();
-//            try {
-//                FileOutputStream fileOutputStream = new FileOutputStream(file);
-//                bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
-//                sendImageMessage(Uri.parse(uri), progressDialog);
-//            } catch (IOException e) {
-//                progressDialog.dismiss();
-//                Toast.makeText(ChatActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-//                e.printStackTrace();
-//            }
-//
-//            return;
-//        }
-//
-//        Paint rectPaint = new Paint();
-//        rectPaint.setStyle(Paint.Style.FILL);
-//
-//        Bitmap tempBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.RGB_565);
-//        Canvas canvas = new Canvas(tempBitmap);
-//        canvas.drawBitmap(bitmap, 0, 0, null);
-//
-//        for(FirebaseVisionText.TextBlock textBlock : blocks){
-//            List<FirebaseVisionText.Line> textLines = textBlock.getLines();
-//
-//            for(FirebaseVisionText.Line currentLine : textLines){
-//                List<FirebaseVisionText.Element> words = currentLine.getElements();
-//
-//                for(FirebaseVisionText.Element currentWord : words){
-//                    RectF rectF = new RectF(currentWord.getBoundingBox());
-//                    rectPaint.setColor(Color.LTGRAY);
-//                    rectPaint.setMaskFilter(new BlurMaskFilter(10, BlurMaskFilter.Blur.SOLID));
-//
-//                    canvas.drawRect(rectF, rectPaint);
-//                }
-//            }
-//        }
-//
-//        try {
-//            FileOutputStream fileOutputStream = new FileOutputStream(file);
-//            tempBitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
-//            sendImageMessage(Uri.parse(uri), progressDialog);
-//        } catch (IOException e) {
-//            progressDialog.dismiss();
-//            Toast.makeText(ChatActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-//            e.printStackTrace();
-//        }
-//    }
 
     @Override
     public void onBackPressed() {

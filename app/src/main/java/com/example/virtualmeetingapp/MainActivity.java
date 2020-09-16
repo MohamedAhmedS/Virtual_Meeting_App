@@ -55,13 +55,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        tabLayout1 = (SpaceTabLayout1) findViewById(R.id.spaceTabLayout1);
-        tabLayout2 = (SpaceTabLayout2) findViewById(R.id.spaceTabLayout2);
-        auth = FirebaseAuth.getInstance();
+            tabLayout1 = (SpaceTabLayout1) findViewById(R.id.spaceTabLayout1);
+            tabLayout2 = (SpaceTabLayout2) findViewById(R.id.spaceTabLayout2);
+            auth = FirebaseAuth.getInstance();
 
-        SharedPreferences.Editor editor = getSharedPreferences("PREFS", MODE_PRIVATE).edit();
-        editor.putString("profileid", Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid());
-        editor.apply();
+//        SharedPreferences.Editor editor = getSharedPreferences("PREFS", MODE_PRIVATE).edit();
+//        editor.putString("profileid", Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid());
+//        editor.apply();
 
 //        Intent intent = getIntent();
 //        intent.getStringExtra("uid");
@@ -78,37 +78,40 @@ public class MainActivity extends AppCompatActivity {
 //            fragmentList.add(new FragmentA());
 //
 //        }
-        //get user object from shared preference
-        user = (User) new SystemPrefs(this).getOjectData(Constants.USER, User.class);
-        String userType = user.getUserType();
-        String id = user.getId();
-        //other info of user
+            //get user object from shared preference
+            user = (User) new SystemPrefs(this).getOjectData(Constants.USER, User.class);
+
+            String userType = user.getUserType();
+            String id = user.getId();
+            //other info of user
 //        String id = user.getId();
 //        String userName = user.getUserName();
-        Log.d("userType" , userType);
+            Log.d("userType", userType);
 
 
-        if(userType != null) {
-            if (userType.equals("visitor")) {
-                tabLayout1.setVisibility(View.VISIBLE);
-                tabLayout2.setVisibility(View.GONE);
+//            if (userType != null) {
+                if (userType.equals("visitor")) {
+                    tabLayout1.setVisibility(View.VISIBLE);
+                    tabLayout2.setVisibility(View.GONE);
 
-                visitor();
-            } else if (userType.equals("officer")) {
-                tabLayout1.setVisibility(View.GONE);
-                tabLayout2.setVisibility(View.VISIBLE);
-                officer();
-            } else if (userType.equals("admin")) {
-                tabLayout1.setVisibility(View.GONE);
-                tabLayout2.setVisibility(View.VISIBLE);
-                admin();
-            } else {
-                tabLayout1.setVisibility(View.VISIBLE);
-                tabLayout2.setVisibility(View.GONE);
-                prisoner();
-            }
+                    visitor();
+                } else if (userType.equals("officer")) {
+                    tabLayout1.setVisibility(View.GONE);
+                    tabLayout2.setVisibility(View.VISIBLE);
+                    officer();
+                } else if (userType.equals("admin")) {
+                    tabLayout1.setVisibility(View.GONE);
+                    tabLayout2.setVisibility(View.VISIBLE);
+                    admin();
+                } else {
+                    tabLayout1.setVisibility(View.VISIBLE);
+                    tabLayout2.setVisibility(View.GONE);
+                    prisoner();
+                }
+//            }
+
         }
-    }
+
 
     @Override
     public void onBackPressed() {

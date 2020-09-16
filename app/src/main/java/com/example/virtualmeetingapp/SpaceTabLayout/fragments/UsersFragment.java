@@ -29,6 +29,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class UsersFragment extends Fragment {
@@ -40,6 +41,7 @@ public class UsersFragment extends Fragment {
     private ImageView btnClose;
     private EditText search_bar;
     private User user;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -53,6 +55,7 @@ public class UsersFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         btnClose.setVisibility(View.GONE);
+
 
         noUser.setVisibility(View.VISIBLE);
 
@@ -71,13 +74,15 @@ public class UsersFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                searchUsers(charSequence.toString().toLowerCase());
+//                searchUsers(charSequence.toString().toLowerCase());
             }
 
             @Override
             public void afterTextChanged(Editable editable) {
+                filter(editable.toString());
                 btnClose.setVisibility(View.VISIBLE);
-                if (search_bar.getText().toString().matches("")) {
+                if(search_bar.getText().toString().matches(""))
+                {
                     btnClose.setVisibility(View.GONE);
                 }
                 btnClose.setOnClickListener(new View.OnClickListener() {
@@ -93,78 +98,23 @@ public class UsersFragment extends Fragment {
 
         return view;
     }
-
-    private void searchUsers(final String s) {
-        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Users");
-        String userType = user.getUserType();
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        userRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                userList.clear();
-                noUser.setVisibility(View.VISIBLE);
-
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    User user = snapshot.getValue(User.class);
-                    if (!user.getId().equals(firebaseUser.getUid())) {
-                        if (userType.equals("officer")) {
-                            if (user.getUserName().contains(s)) {
-
-                                if (user.getUserType().equals("inmate") || user.getUserType().equals("visitor")) {
-                                    userList.add(user);
-                                    noUser.setVisibility(View.GONE);
-                                } else {
-                                    userList.clear();
-                                    noUser.setVisibility(View.VISIBLE);
-                                }
-                            }
-                        } else if (userType.equals("inmate")) {
-                            if (user.getUserName().contains(s)) {
-
-                                if (user.getUserType().equals("visitor")) {
-                                    userList.add(user);
-                                    noUser.setVisibility(View.GONE);
-                                } else {
-                                    userList.clear();
-                                    noUser.setVisibility(View.VISIBLE);
-                                }
-                            }
-                        } else if (userType.equals("visitor")) {
-                            if (user.getUserName().contains(s)) {
-
-                                if (user.getUserType().equals("officer") || user.getUserType().equals("inmate")) {
-                                    userList.add(user);
-                                    noUser.setVisibility(View.GONE);
-                                } else {
-                                    userList.clear();
-                                    noUser.setVisibility(View.VISIBLE);
-                                }
-                            }
-
-                        } else if (userType.equals("admin")) {
-                            userList.add(user);
-                            noUser.setVisibility(View.GONE);
-                        }
-
-                    }
-                }
-
-                userAdapter = new UserAdapter(getContext(), userList, true);
-                recyclerView.setAdapter(userAdapter);
-                recyclerView.setItemViewCacheSize(1024);
-                userAdapter.notifyDataSetChanged();
+    private void filter(String text) {
+        ArrayList<User> filteredList = new ArrayList<>();
+        noUser.setVisibility(View.VISIBLE);
+        for (User user : userList) {
+            if (user.getUserName().toLowerCase().contains(text.toLowerCase())) {
+                filteredList.add(user);
+                noUser.setVisibility(View.GONE);
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                noUser.setVisibility(View.VISIBLE);
-
-            }
-        });
+        }
+        userAdapter.filterList(filteredList);
     }
 
-
     private void readUsers() {
+
+
+        List<String> listOfficer = Arrays.asList("inmate", "visitor", "officer");
+        List<String> listVisitor = Arrays.asList("inmate", "officer");
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
         String userType = user.getUserType();
@@ -179,7 +129,7 @@ public class UsersFragment extends Fragment {
                         User user = snapshot.getValue(User.class);
                         if (!user.getId().equals(firebaseUser.getUid())) {
                             if (userType.equals("officer")) {
-                                if ((user.getUserType().equals("inmate") || user.getUserType().equals("visitor") || user.getUserType().equals("officer")) || (user.getUserType().equals("inmate") && user.getUserType().equals("visitor") && user.getUserType().equals("officer"))) {
+                                if (listOfficer.contains(user.getUserType())) {
                                     userList.add(user);
                                     noUser.setVisibility(View.GONE);
                                 }
@@ -190,7 +140,7 @@ public class UsersFragment extends Fragment {
                                 }
 
                             } else if (userType.equals("visitor")) {
-                                if ((user.getUserType().equals("officer") || user.getUserType().equals("inmate")) || (user.getUserType().equals("officer") && user.getUserType().equals("inmate"))) {
+                                if (listVisitor.contains(user.getUserType())) {
                                     userList.add(user);
                                     noUser.setVisibility(View.GONE);
                                 }

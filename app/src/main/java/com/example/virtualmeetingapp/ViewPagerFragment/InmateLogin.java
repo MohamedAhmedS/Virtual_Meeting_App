@@ -93,26 +93,16 @@ public class InmateLogin extends Fragment {
                                                         for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
                                                             Log.d("userTypeF", userSnapshot.child("userType").getValue(String.class));
 
-                                                            SharedPreferences.Editor editor = requireActivity().getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
-                                                            editor.putString(TextUtil.PREF_LATEST_USER_ID, auth.getCurrentUser().getUid());
-                                                            editor.apply();
 
                                                             User userModel = new User(userSnapshot.child("id").getValue(String.class),
                                                                     userSnapshot.child("userType").getValue(String.class),
                                                                     userSnapshot.child("userName").getValue(String.class),
-                                                                    null, null, null , null );
-
+                                                                    null, null, null, null);
+//
                                                             new SystemPrefs(requireActivity()).setObjectData(Constants.USER, (Object) userModel);
 
                                                             Intent intent = new Intent(getContext(), MainActivity.class);
-                                                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                            intent.putExtra("uid", auth.getCurrentUser().getUid());
-                                                            intent.putExtra("userType" , userSnapshot.child("userType").getValue(String.class));
-//                                                intent.putExtra("userType", )
                                                             startActivity(intent);
-//                                                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                                                            Global.setCurrentUser(dataSnapshot.getValue(User.class));
-                                                            requireActivity().finish();
                                                         }
                                                     }
 
